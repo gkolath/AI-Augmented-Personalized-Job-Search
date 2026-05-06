@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**' },
     ],
   },
-  serverExternalPackages: ['openai'],
+  serverExternalPackages: ['@anthropic-ai/sdk'],
 };
 
 export default nextConfig;

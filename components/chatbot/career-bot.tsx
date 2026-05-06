@@ -64,7 +64,15 @@ export function CareerBot({ onClose }: Props) {
   }
 
   function renderContent(content: string) {
-    return content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')
+    // Split on bold markers and newlines, return React nodes instead of raw HTML
+    const parts = content.split(/(\*\*.*?\*\*|\n)/g)
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>
+      }
+      if (part === '\n') return <br key={i} />
+      return part
+    })
   }
 
   return (
@@ -103,7 +111,7 @@ export function CareerBot({ onClose }: Props) {
                     ? 'bg-primary text-white rounded-br-sm'
                     : 'bg-muted text-foreground rounded-bl-sm'
                 }`}>
-                  <div dangerouslySetInnerHTML={{ __html: renderContent(msg.content) }} />
+                  <div>{renderContent(msg.content)}</div>
                   {msg.jobs && msg.jobs.length > 0 && (
                     <div className="mt-3 space-y-2">
                       <div className="text-xs opacity-70 mb-1">Found {msg.jobs.length} matching jobs:</div>
