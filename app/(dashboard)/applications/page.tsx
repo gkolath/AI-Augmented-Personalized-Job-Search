@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Navbar } from '@/components/layout/navbar'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,9 @@ const EMPTY_APP: Partial<Application> = {
 }
 
 export default function ApplicationsPage() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const [apps, setApps] = useState<Application[]>(DEMO_APPS)
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
@@ -236,7 +239,7 @@ export default function ApplicationsPage() {
                     )}
 
                     <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      {app.applied_at && <span>Applied {formatDistanceToNow(new Date(app.applied_at), { addSuffix: true })}</span>}
+                      {app.applied_at && <span>Applied {mounted ? formatDistanceToNow(new Date(app.applied_at), { addSuffix: true }) : new Date(app.applied_at).toLocaleDateString()}</span>}
                       {app.contact_name && <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {app.contact_name}</span>}
                     </div>
                   </div>

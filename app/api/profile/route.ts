@@ -18,9 +18,22 @@ export async function PATCH(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
+  const {
+    full_name, phone, linkedin_url, github_url, skills, experience_years,
+    experience_level, preferred_countries, needs_visa, expected_salary_min,
+    expected_salary_max, salary_currency, job_titles, freelance_interest,
+    work_mode, resume_url, resume_text, summary
+  } = body
+
   const { error } = await supabase
     .from('profiles')
-    .update({ ...body, updated_at: new Date().toISOString() })
+    .update({
+      full_name, phone, linkedin_url, github_url, skills, experience_years,
+      experience_level, preferred_countries, needs_visa, expected_salary_min,
+      expected_salary_max, salary_currency, job_titles, freelance_interest,
+      work_mode, resume_url, resume_text, summary,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', user.id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

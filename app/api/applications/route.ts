@@ -21,10 +21,13 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await request.json()
+  const { company, position, job_url, source, status, applied_at, match_score, notes } = await request.json()
   const { data, error } = await supabase
     .from('applications')
-    .insert({ ...body, user_id: user.id })
+    .insert({
+      company, position, job_url, source, status, applied_at, match_score, notes,
+      user_id: user.id
+    })
     .select()
     .single()
 
@@ -37,10 +40,13 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id, ...updates } = await request.json()
+  const { id, company, position, job_url, source, status, applied_at, match_score, notes } = await request.json()
   const { error } = await supabase
     .from('applications')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update({
+      company, position, job_url, source, status, applied_at, match_score, notes,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', id)
     .eq('user_id', user.id)
 

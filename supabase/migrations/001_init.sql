@@ -85,6 +85,8 @@ alter table public.profiles enable row level security;
 alter table public.applications enable row level security;
 alter table public.saved_jobs enable row level security;
 alter table public.chat_sessions enable row level security;
+alter table public.job_cache enable row level security;
+alter table public.analytics_events enable row level security;
 
 create policy "Users can view own profile" on public.profiles for select using (auth.uid() = id);
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
@@ -93,6 +95,12 @@ create policy "Users can insert own profile" on public.profiles for insert with 
 create policy "Users can manage own applications" on public.applications for all using (auth.uid() = user_id);
 create policy "Users can manage own saved jobs" on public.saved_jobs for all using (auth.uid() = user_id);
 create policy "Users can manage own chat sessions" on public.chat_sessions for all using (auth.uid() = user_id);
+
+-- Restrict public client-side access to job_cache (backend service role handles operations)
+create policy "Block client access to job_cache" on public.job_cache for all using (false);
+
+-- Allow authenticated users to insert analytics events but prevent reading or deleting from client side
+create policy "Users can insert own analytics events" on public.analytics_events for insert with check (auth.uid() = user_id);
 
 -- Trigger to create profile on signup
 create or replace function public.handle_new_user()

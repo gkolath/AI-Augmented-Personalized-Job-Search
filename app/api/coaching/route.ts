@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateWeeklyCoachingPlan } from '@/lib/openai/client'
+import { createClient } from '@/lib/supabase/server'
 
 const DEMO_PLAN = {
   week_number: 1,
@@ -63,6 +64,10 @@ const DEMO_PLAN = {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const body = await request.json()
     const { profile, weekNumber, applicationsThisWeek, interviewsScheduled } = body
 

@@ -46,12 +46,13 @@ const SOURCE_COLORS: Record<string, string> = {
 }
 
 export default function FreelancePage() {
+  const [mounted, setMounted] = useState(false)
   const [gigs, setGigs] = useState<Gig[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('developer')
 
-  useEffect(() => { fetchGigs() }, [])
+  useEffect(() => { setMounted(true); fetchGigs() }, [])
 
   async function fetchGigs(q = query) {
     setLoading(true)
@@ -167,7 +168,7 @@ export default function FreelancePage() {
                         </span>
                       )}
                       <span className="flex items-center gap-1 text-xs">
-                        {formatDistanceToNow(new Date(gig.posted_at), { addSuffix: true })}
+                        {mounted ? formatDistanceToNow(new Date(gig.posted_at), { addSuffix: true }) : new Date(gig.posted_at).toLocaleDateString()}
                       </span>
                     </div>
 

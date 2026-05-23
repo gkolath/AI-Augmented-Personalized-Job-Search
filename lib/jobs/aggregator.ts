@@ -1,5 +1,6 @@
 import { Job } from '@/types'
 import { subDays, isAfter, parseISO } from 'date-fns'
+import { getDeterministicId } from '@/lib/utils'
 
 const FOURTEEN_DAYS_AGO = subDays(new Date(), 14)
 
@@ -287,7 +288,7 @@ function parseRSSFeed(xml: string, source: string): Job[] {
     const position = title.includes(' at ') ? title.split(' at ')[0] : title
 
     return {
-      id: `${source.toLowerCase()}-${i}-${Date.now()}`,
+      id: getDeterministicId(source.toLowerCase(), link || `${title}-${company}`),
       title: position.trim(),
       company: company.trim() || 'Unknown',
       location: 'Remote',

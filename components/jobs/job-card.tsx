@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Job } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +24,9 @@ const sponsorshipConfig = {
 }
 
 export function JobCard({ job, onClick }: Props) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const priority = job.priority ? priorityConfig[job.priority] : null
   const sponsorship = sponsorshipConfig[job.sponsorship]
 
@@ -66,7 +70,7 @@ export function JobCard({ job, onClick }: Props) {
               {job.company_rating && <span className="flex items-center gap-0.5 text-yellow-400"><Star className="h-3 w-3 fill-current" />{job.company_rating}</span>}
             </span>
             <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {job.location}</span>
-            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {formatDistanceToNow(new Date(job.posted_at), { addSuffix: true })}</span>
+            <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {mounted ? formatDistanceToNow(new Date(job.posted_at), { addSuffix: true }) : new Date(job.posted_at).toLocaleDateString()}</span>
             {formatSalary() && <span className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" /> {formatSalary()}</span>}
           </div>
 

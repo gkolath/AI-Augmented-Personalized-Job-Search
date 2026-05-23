@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateMockInterviewQuestion, evaluateMockAnswer } from '@/lib/openai/client'
+import { createClient } from '@/lib/supabase/server'
 
 const DEMO_QUESTIONS = [
   { question: 'Tell me about yourself and your background in software development.', category: 'hr', difficulty: 'easy', hint: 'Cover your experience, key skills, and why you want this role.' },
@@ -11,6 +12,10 @@ const DEMO_QUESTIONS = [
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const body = await request.json()
     const { action, jobTitle, company, type, previousQuestions, roundNumber, question, answer, category } = body
 

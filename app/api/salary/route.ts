@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSalaryIntelligence } from '@/lib/openai/client'
+import { createClient } from '@/lib/supabase/server'
 
 const DEMO_SALARY = {
   role: 'Software Engineer',
@@ -44,13 +45,17 @@ const DEMO_SALARY = {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const role = searchParams.get('role') || 'Software Engineer'
-  const location = searchParams.get('location') || 'United States'
-  const yoe = parseInt(searchParams.get('yoe') || '3')
-  const skills = searchParams.get('skills')?.split(',') || []
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
+    const { searchParams } = new URL(request.url)
+    const role = searchParams.get('role') || 'Software Engineer'
+    const location = searchParams.get('location') || 'United States'
+    const yoe = parseInt(searchParams.get('yoe') || '3')
+    const skills = searchParams.get('skills')?.split(',') || []
+
     if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'your_anthropic_api_key') {
       return NextResponse.json({ salary: { ...DEMO_SALARY, role, location } })
     }
@@ -59,6 +64,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ salary })
   } catch (error) {
     console.error('Salary API error:', error)
+    // Simple fallback logic
+    let role = 'Software Engineer'
+    let location = 'United States'
+    try {
+      const { searchParams } = new URL(request.url)
+      role = searchParams.get('role') || 'Software Engineer'
+      location = searchParams.get('location') || 'United States'
+    } catch {}
     return NextResponse.json({ salary: { ...DEMO_SALARY, role, location } })
   }
 }

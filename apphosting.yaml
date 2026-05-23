@@ -1,0 +1,34 @@
+# Firebase App Hosting Configuration
+# For deployment details: https://firebase.google.com/docs/app-hosting
+
+runConfig:
+  cpu: 1
+  memoryMiB: 512
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+
+env:
+  # Public variables (available at both build & runtime)
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: "https://your-supabase-project.supabase.co"
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: "your-supabase-anon-key"
+  - variable: NEXT_PUBLIC_APP_URL
+    value: "https://your-app.web.app"
+  - variable: NEXT_PUBLIC_APP_NAME
+    value: "AI Global Job Hunter"
+
+  # Secrets (reference keys stored in Cloud Secret Manager)
+  # Set these in your project using:
+  # npx -y firebase-tools@latest apphosting:secrets:set ANTHROPIC_API_KEY
+  - variable: ANTHROPIC_API_KEY
+    secret: ANTHROPIC_API_KEY
+  - variable: SUPABASE_SERVICE_ROLE_KEY
+    secret: SUPABASE_SERVICE_ROLE_KEY
+  - variable: RAPIDAPI_KEY
+    secret: RAPIDAPI_KEY
+  - variable: ADZUNA_APP_ID
+    value: ""
+  - variable: ADZUNA_API_KEY
+    secret: ADZUNA_API_KEY

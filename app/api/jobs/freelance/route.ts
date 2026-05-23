@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Job } from '@/types'
 import { subDays, isAfter } from 'date-fns'
+import { getDeterministicId } from '@/lib/utils'
 
 const FOURTEEN_DAYS_AGO = subDays(new Date(), 14)
 
@@ -97,7 +98,7 @@ async function fetchWWRContract() {
       const position = parts.slice(1).join(': ') || title
 
       return {
-        id: `wwr-fl-${i}-${Date.now()}`,
+        id: getDeterministicId('wwr-fl', link || `${title}-${company}`),
         title: position.trim(),
         company: company.trim(),
         budget_min: undefined as number | undefined,

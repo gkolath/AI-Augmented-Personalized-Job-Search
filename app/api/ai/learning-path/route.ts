@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateLearningPath } from '@/lib/openai/client'
+import { createClient } from '@/lib/supabase/server'
 
 const DEMO_PATH = {
   target_role: 'Senior Software Engineer',
@@ -27,6 +28,10 @@ const DEMO_PATH = {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const body = await request.json()
     const { currentSkills, targetRole, experienceYears, hoursPerDay } = body
 
