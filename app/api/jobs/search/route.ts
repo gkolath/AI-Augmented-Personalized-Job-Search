@@ -18,6 +18,19 @@ export async function GET(request: NextRequest) {
 
   if (!query) return NextResponse.json({ error: 'Query required' }, { status: 400 })
 
+  // Initialize Supabase outside the try-catch block to correctly propagate
+  // Next.js dynamic-bail exceptions during builds when SUPABASE_CONFIGURED is true!
+  let supabase = null
+  let user = null
+  if (SUPABASE_CONFIGURED) {
+    const { createClient } = await import('@/lib/supabase/server')
+    supabase = await createClient()
+    try {
+      const { data } = await supabase.auth.getUser()
+      user = data.user
+    } catch {}
+  }
+
   try {
     // Fetch jobs from all sources
     let jobs = await aggregateJobs({ query, location, country, remote })
@@ -28,10 +41,8 @@ export async function GET(request: NextRequest) {
       : jobs
 
     // Try Supabase cache + profile enrichment only if configured
-    if (SUPABASE_CONFIGURED) {
+    if (supabase) {
       try {
-        const { createClient } = await import('@/lib/supabase/server')
-        const supabase = await createClient()
         const cacheKey = `jobs:${query}:${location}:${country}:${remote}`
 
         const { data: cached } = await supabase
@@ -51,7 +62,6 @@ export async function GET(request: NextRequest) {
           })
         }
 
-        const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
           if (profile) filtered = enrichJobsWithMatches(filtered, profile)
